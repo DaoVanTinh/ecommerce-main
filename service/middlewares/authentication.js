@@ -1,29 +1,34 @@
 import jwt from "jsonwebtoken";
 import userModel from "../models/users.js";
 
+export const isAdmin = (req, res, next) => {
+  console.log("Middleware isAdmin chạy");
+  next();
+};
 const authentication = async (req, res, next) => {
   const bearerToken = req.headers.authorization;
 
-  if (!bearerToken) {
-    return res.status(401).json({ message: "Ban chua dang nhap" });
+  if (!bearerToken || !bearerToken.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Bạn chưa đăng nhập" });
   }
+
   const token = bearerToken.split(" ")[1];
+
   try {
-    const checkToken = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("checkToken", checkToken);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const userId = checkToken.id;
-    const user = await userModel.findById(userId);
+    const user = await userModel.findById(decoded.id).select("-password");
     if (!user) {
-      return res.status(401).json({ message: "Ban chua dang nhap 2" });
+      return res.status(401).json({ message: "Tài khoản không tồn tại" });
     }
-    req.user = user;
-    req.userId = userId;
-    console.log("next", userId);
 
+    req.user = user;
+    req.userId = user._id;
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Ban chua dang nhap 3" });
+    return res
+      .status(401)
+      .json({ message: "Token không hợp lệ hoặc đã hết hạn" });
   }
 };
 

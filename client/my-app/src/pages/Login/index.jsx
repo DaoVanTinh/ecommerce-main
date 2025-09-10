@@ -1,109 +1,101 @@
+import { useContext, useState } from "react";
 import React from "react";
-import { Button, Checkbox, Form, Input } from "antd";
+import loginBanner from "../../assets/loginbanner.png";
+import logo from "../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../services";
-import { saveToLocalStorage } from "../../utils";
-import { toast } from "react-hot-toast";
+import { useAuth } from "../../context/AuthProvider";
 
-const Login = () => {
-  const [form] = Form.useForm();
-  const navigation = useNavigate();
+function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
-  const onFinish = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     try {
-      const username = form.getFieldValue("username");
-      const password = form.getFieldValue("password");
+      const res = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-      const result = await login(username, password);
+      const data = await res.json();
 
-      if (result.data.isSuccess == true) {
-        toast.success("Success");
-        saveToLocalStorage("token", JSON.stringify(result.data.token));
-        navigation("/product-management");
+      if (res.ok && data.token && data.user) {
+        login(data.token, data.user);
+        navigate("/");
       } else {
-        toast.error("Đăng nhập thất bại");
+        setMessage("❌ " + (data.message || "Đăng nhập thất bại"));
       }
-    } catch (error) {
-      toast.error("Đăng nhập thất bại");
+    } catch {
+      setMessage("Lỗi server!");
     }
   };
 
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
-
   return (
-    <div
-      className=""
-      style={{
-        marginTop: "20px",
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <div>
-        <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Đăng nhập</h1>
-        <Form
-          form={form}
-          name="basic"
-          labelCol={{
-            span: 8,
-          }}
-          wrapperCol={{
-            span: 16,
-          }}
-          style={{
-            maxWidth: 600,
-          }}
-          initialValues={{
-            remember: true,
-          }}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-          autoComplete="off"
-        >
-          <Form.Item
-            label="UserName"
-            name="username"
-            rules={[
-              {
-                required: true,
-                message: "Pls input your name!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
+    <div className="h-screen flex">
+      <div className="w-1/2 bg-gray-100 flex items-center justify-center relative">
+        <img
+          src={loginBanner}
+          alt="banner"
+          className="w-full h-full object-contain"
+        />
+        <div className="absolute top-8 left-1/2 -translate-x-1/2">
+          <button onClick={() => navigate("/")} className="cursor-pointer">
+            <img src={logo} alt="logo" />
+          </button>
+        </div>
+      </div>
+      <div className="w-1/2 flex items-start justify-end bg-white">
+        <form onSubmit={handleSubmit} className="mt-[220px] mr-[160px]">
+          <h2 className="font-poppins font-medium text-[40px] mb-6">
+            Đăng Nhập
+          </h2>
+          <div className="flex mb-8">
+            <p className="text-[#6C7275] mr-1">Bạn chưa có tài khoản?</p>
+            <span
+              className="text-[#38CB89] cursor-pointer"
+              onClick={() => navigate("/register")}
+            >
+              Đăng ký
+            </span>
+          </div>
 
-          <Form.Item
-            label="Password"
-            name="password"
-            rules={[
-              {
-                required: true,
-                message: "Pls input your password!",
-              },
-            ]}
-          >
-            <Input.Password />
-          </Form.Item>
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full p-2 mb-3 border rounded"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-          <Form.Item
-            wrapperCol={{
-              offset: 8,
-              span: 16,
-            }}
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full p-2 mb-3 border rounded"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          <button
+            type="submit"
+            className="w-full bg-[#141718] text-white p-2 rounded hover:bg-[#232628]"
           >
-            <Button type="primary" htmlType="submit">
-              Login
-            </Button>
-          </Form.Item>
-        </Form>
+            Đăng Nhập
+          </button>
+
+          {message && (
+            <p className="mt-3 text-center text-sm text-red-500">{message}</p>
+          )}
+        </form>
       </div>
     </div>
   );
-};
+}
 
 export default Login;
