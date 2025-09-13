@@ -2,28 +2,16 @@ import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema(
   {
-    userId: {
+    user_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-    products: [
-      {
-        productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
-        quantity: { type: Number, required: true, min: 1 },
-      },
-    ],
-    totalPrice: { type: Number, required: true },
-    status: {
-      type: String,
-      enum: ["pending", "paid", "shipped", "completed", "cancelled"],
-      default: "pending",
-    },
+    order_date: { type: Date, default: Date.now },
+    status: { type: String, default: "pending" },
+    total_amount: { type: Number, required: true },
   },
-  {
-    versionKey: false,
-    timestamps: true,
-  }
+  { versionKey: false }
 );
 
 export default mongoose.model("Order", orderSchema);

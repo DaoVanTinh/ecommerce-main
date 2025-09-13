@@ -12,7 +12,15 @@ export const register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ username, email, password: hashedPassword });
+
+    const newUser = new User({
+      username,
+      email,
+      password: hashedPassword,
+      role: "user",
+      status: "active",
+    });
+
     await newUser.save();
 
     res.status(201).json({ message: "Tạo tài khoản thành công!" });
@@ -38,10 +46,14 @@ export const login = async (req, res) => {
         .status(400)
         .json({ message: "Tài khoản hoặc mật khẩu không chính xác" });
     }
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
+    if (user.status !== "active") {
+      return res.status(403).json({ message: "Tài khoản đã bị khóa" });
+    }
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
 
     res.status(200).json({
       token,
@@ -49,6 +61,8 @@ export const login = async (req, res) => {
         id: user._id,
         username: user.username,
         email: user.email,
+        role: user.role,
+        status: user.status,
       },
     });
   } catch (err) {

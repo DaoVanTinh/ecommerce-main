@@ -8,7 +8,7 @@ import {
   getNewProducts,
   getRandomProducts,
 } from "../controllers/products.js";
-import { isAdmin } from "../middlewares/authentication.js";
+import { authentication, isAdmin } from "../middlewares/authentication.js";
 
 const productsRouter = express.Router();
 
@@ -17,8 +17,8 @@ productsRouter.get("/new", getNewProducts);
 productsRouter.get("/random", getRandomProducts);
 productsRouter.get("/:id", getProductById);
 
-productsRouter.post("/", isAdmin, createProduct);
-productsRouter.put("/:id", isAdmin, updateProduct);
-productsRouter.delete("/:id", isAdmin, deleteProduct);
+productsRouter.post("/", authentication, isAdmin, createProduct);
+productsRouter.put("/:id", authentication, isAdmin, updateProduct);
+productsRouter.delete("/:id", authentication, isAdmin, deleteProduct);
 
 export default productsRouter;
