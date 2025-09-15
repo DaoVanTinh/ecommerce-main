@@ -14,7 +14,6 @@ const DashboardAdmin = () => {
     description: "",
   });
 
-  // Format số sang VNĐ
   const formatVND = (value) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -22,7 +21,6 @@ const DashboardAdmin = () => {
     }).format(value);
   };
 
-  // Fetch tất cả sản phẩm
   const fetchProducts = async () => {
     try {
       const res = await getProducts();
@@ -36,18 +34,29 @@ const DashboardAdmin = () => {
     fetchProducts();
   }, []);
 
-  // Tạo sản phẩm mới
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
-      const productData = {
-        ...newProduct,
-        price: Number(newProduct.price),
-        stock: Number(newProduct.stock),
-      };
+      const formData = new FormData();
+      formData.append("name", newProduct.name);
+      formData.append("price", newProduct.price);
+      formData.append("stock", newProduct.stock);
+      formData.append("description", newProduct.description);
 
-      await createProduct(productData);
-      setNewProduct({ name: "", price: "", stock: "", description: "" });
+      if (newProduct.images) {
+        for (let i = 0; i < newProduct.images.length; i++) {
+          formData.append("images", newProduct.images[i]);
+        }
+      }
+
+      await createProduct(formData);
+      setNewProduct({
+        name: "",
+        price: "",
+        stock: "",
+        description: "",
+        images: [],
+      });
       fetchProducts();
     } catch (err) {
       console.error("Create product error:", err.response?.data || err);
@@ -55,7 +64,6 @@ const DashboardAdmin = () => {
     }
   };
 
-  // Xóa sản phẩm
   const handleDelete = async (id) => {
     if (window.confirm("Xóa sản phẩm này?")) {
       try {
@@ -107,6 +115,16 @@ const DashboardAdmin = () => {
           }
           className="w-full border p-2 mb-2 rounded"
           required
+        />
+
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={(e) =>
+            setNewProduct({ ...newProduct, images: e.target.files })
+          }
+          className="w-full border p-2 mb-2 rounded"
         />
 
         <textarea

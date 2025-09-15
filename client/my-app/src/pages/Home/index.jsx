@@ -111,7 +111,11 @@ function Home() {
               <div key={product._id} className="px-3">
                 <Link to={`/products/${product._id}`}>
                   <ImageWithFallback
-                    src={product.image}
+                    src={
+                      product.images && product.images.length > 0
+                        ? product.images[0]
+                        : ImgError
+                    }
                     fallback={ImgError}
                     alt={product.name}
                     className="w-full h-52 object-cover rounded-lg"
@@ -190,7 +194,11 @@ function Home() {
                   cover={
                     <img
                       alt={item.name}
-                      src={item.image}
+                      src={
+                        item.images && item.images.length > 0
+                          ? item.images[0]
+                          : ImgError
+                      }
                       style={{ height: 200, objectFit: "cover" }}
                     />
                   }
@@ -222,7 +230,7 @@ function Home() {
               Hàng nghìn sản phẩm đang chờ đón bạn.
             </p>
           </div>
-          <Countdown targetDate="2025-09-15T00:00:00" />
+          <Countdown targetDate="2025-10-15T00:00:00" />
         </div>
       </div>
       <Value />
