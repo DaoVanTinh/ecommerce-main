@@ -6,6 +6,7 @@ import authRoutes from "./routers/auth.js";
 import productRoutes from "./routers/product.js";
 import orderRoutes from "./routers/order.js";
 import adminAuthRoutes from "./routers/adminAuth.js";
+import categoryRoutes from "./routers/category.js";
 
 dotenv.config();
 connectDB();
@@ -19,6 +20,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminAuthRoutes);
+app.use("/api/category", categoryRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

@@ -13,17 +13,19 @@ function NavigationBar({ className = "" }) {
   const items = user
     ? [
         { key: "profile", label: "Trang cá nhân" },
+        { key: "orders", label: "Đơn hàng" },
         { key: "logout", label: "Đăng xuất" },
       ]
     : [
         { key: "login", label: "Đăng nhập" },
         { key: "register", label: "Đăng ký" },
       ];
+
   const handleMenuClick = (e) => {
     if (e.key === "login") navigate("/login");
     if (e.key === "register") navigate("/register");
-
     if (e.key === "profile") navigate("/profile");
+    if (e.key === "orders") navigate("/orders");
     if (e.key === "logout") {
       logout();
       navigate("/");

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import Slider from "react-slick";
 import axios from "axios";
 import { ArrowRight } from "lucide-react";
 import { List, Card } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   NotificationBar,
   NavigationBar,
@@ -35,6 +34,7 @@ import {
 const { Meta } = Card;
 
 function Home() {
+  const navigate = useNavigate();
   const [newProducts, setNewProducts] = useState([]);
   const [randomProducts, setRandomProducts] = useState([]);
 
@@ -45,20 +45,15 @@ function Home() {
       .catch((err) => console.error(err));
   }, []);
 
+  const latestProducts = [...newProducts]
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 4);
   useEffect(() => {
     axios
       .get("http://localhost:5000/api/products/random")
       .then((res) => setRandomProducts(res.data))
       .catch((err) => console.error(err));
   }, []);
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 4,
-    slidesToScroll: 4,
-    arrows: true,
-  };
   return (
     <div>
       <NotificationBar />
@@ -105,31 +100,43 @@ function Home() {
       </div>
       <div className="product-carousel ml-[160px] mr-[160px]">
         <h1 className="font-medium text-[40px] mb-12">Sản phẩm mới</h1>
-        <Slider {...settings}>
-          {Array.isArray(newProducts) && newProducts.length > 0 ? (
-            newProducts.map((product) => (
-              <div key={product._id} className="px-3">
-                <Link to={`/products/${product._id}`}>
-                  <ImageWithFallback
-                    src={
-                      product.images && product.images.length > 0
-                        ? product.images[0]
-                        : ImgError
+        <List
+          grid={{ gutter: 16, column: 4 }}
+          dataSource={latestProducts}
+          renderItem={(item) => (
+            <List.Item>
+              <Link to={`/products/${item._id}`}>
+                <Card
+                  hoverable
+                  cover={
+                    <ImageWithFallback
+                      src={
+                        item.images && item.images.length > 0
+                          ? item.images[0]
+                          : ImgError
+                      }
+                      fallback={ImgError}
+                      alt={item.name}
+                      className="w-full h-52 object-cover rounded-lg"
+                    />
+                  }
+                >
+                  <Meta
+                    title={item.name}
+                    description={
+                      <div>
+                        <p className="text-sm text-gray-600 truncate">
+                          {item.description}
+                        </p>
+                        <p className="mt-1 font-semibold">${item.price}</p>
+                      </div>
                     }
-                    fallback={ImgError}
-                    alt={product.name}
-                    className="w-full h-52 object-cover rounded-lg"
                   />
-                  <h3 className="mt-2 text-lg font-medium">{product.name}</h3>
-                </Link>
-                <p className="text-sm text-gray-600">{product.description}</p>
-                <p className="mt-1 font-semibold">Price: ${product.price}</p>
-              </div>
-            ))
-          ) : (
-            <p>Đang tải sản phẩm...</p>
+                </Card>
+              </Link>
+            </List.Item>
           )}
-        </Slider>
+        />
       </div>
       <div className="banner-grid ml-[160px] mr-[160px]">
         <h1 className="font-medium text-[40px] mb-12 mt-12">
@@ -144,7 +151,10 @@ function Home() {
             />
             <div className="absolute left-12 bottom-12 flex flex-col items-start justify-center text-black space-y-3">
               <span className="text-[34px] font-medium">Headband</span>
-              <span className="flex text-[16px] font-medium items-center justify-center underline decoration-1 cursor-pointer">
+              <span
+                className="flex text-[16px] font-medium items-center justify-center underline decoration-1 cursor-pointer"
+                onClick={() => navigate("/products?category=Tai Nghe")}
+              >
                 Vào bộ sưu tập <ArrowRight className="ml-1" size={20} />
               </span>
             </div>
@@ -158,7 +168,10 @@ function Home() {
               />
               <div className="absolute left-8 bottom-10 flex flex-col items-start justify-center text-black space-y-3">
                 <span className="text-[34px] font-medium">Accessories</span>
-                <span className="flex text-[16px] font-medium items-center justify-center underline decoration-1 cursor-pointer">
+                <span
+                  className="flex text-[16px] font-medium items-center justify-center underline decoration-1 cursor-pointer"
+                  onClick={() => navigate("/products?category=Accessories")}
+                >
                   Vào bộ sưu tập <ArrowRight className="ml-1" size={20} />
                 </span>
               </div>
@@ -171,7 +184,10 @@ function Home() {
               />
               <div className="absolute left-8 bottom-10 flex flex-col items-start justify-center text-black space-y-3">
                 <span className="text-[34px] font-medium">Earbuds</span>
-                <span className="flex text-[16px] font-medium items-center justify-center underline decoration-1 cursor-pointer">
+                <span
+                  className="flex text-[16px] font-medium items-center justify-center underline decoration-1 cursor-pointer"
+                  onClick={() => navigate("/products?category=Earbuds")}
+                >
                   Vào bộ sưu tập <ArrowRight className="ml-1" size={20} />
                 </span>
               </div>
@@ -192,14 +208,15 @@ function Home() {
                 <Card
                   hoverable
                   cover={
-                    <img
-                      alt={item.name}
+                    <ImageWithFallback
                       src={
                         item.images && item.images.length > 0
                           ? item.images[0]
                           : ImgError
                       }
-                      style={{ height: 200, objectFit: "cover" }}
+                      fallback={ImgError}
+                      alt={item.name}
+                      className="w-full h-52 object-cover rounded-lg"
                     />
                   }
                 >

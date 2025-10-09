@@ -1,77 +1,50 @@
-import { useContext } from "react";
-import { CartContext } from "../../context/CartProvider";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import React from "react";
+import { CartContext } from "../../context/CartProvider";
 import { Footer, NavigationBar, NotificationBar } from "../../components";
+import { ImgError } from "../../assets";
+import { createOrder } from "../../services/cartApi";
 
 function Cart() {
-  const { cart, removeFromCart, updateQuantity, total } =
-    useContext(CartContext);
+  const { cart, removeFromCart, updateQuantity } = useContext(CartContext);
   const navigate = useNavigate();
 
-  if (cart.length === 0) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <NotificationBar />
-        <NavigationBar />
-
-        <div className="flex-grow flex items-center justify-center">
-          <p className="p-8 text-center">🛒 Giỏ hàng trống</p>
-        </div>
-
-        <Footer />
-      </div>
-    );
-  }
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const handleCheckout = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    if (!localStorage.getItem("token")) {
       alert("Bạn cần đăng nhập để thanh toán!");
       navigate("/login");
       return;
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          products: cart.map((item) => ({
-            productId: item._id,
-            quantity: item.quantity,
-          })),
-          totalPrice: total,
-        }),
-      });
-
-      const data = await res.json();
-      if (res.status === 401) {
-        localStorage.removeItem("token");
-        alert("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!");
-        navigate("/login");
-        return;
-      }
-      if (res.ok) {
-        alert("Đặt hàng thành công!");
-        navigate("/orders");
-      } else {
-        alert(data.error || data.message || "Có lỗi xảy ra khi đặt hàng");
-      }
+      await createOrder(cart, total);
+      alert("Đặt hàng thành công!");
+      navigate("/orders");
     } catch (err) {
       console.error("Checkout error:", err);
-      alert("Không thể kết nối tới server!");
+      alert(err.response?.data?.error || "Có lỗi xảy ra khi đặt hàng");
     }
   };
+
+  if (cart.length === 0)
+    return (
+      <div className="min-h-screen flex flex-col">
+        <NotificationBar />
+        <NavigationBar />
+        <div className="flex-grow flex items-center justify-center">
+          <p className="p-8 text-center text-xl">🛒 Giỏ hàng trống</p>
+        </div>
+        <Footer />
+      </div>
+    );
 
   return (
     <div>
       <NotificationBar />
       <NavigationBar />
-      <div className="p-8">
+      <div className="p-8 max-w-5xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">Giỏ hàng</h1>
         <div className="space-y-4">
           {cart.map((item) => (
@@ -81,18 +54,20 @@ function Cart() {
             >
               <div className="flex items-center gap-4">
                 <img
-                  src={item.image}
+                  src={item.images?.[0] || ImgError}
                   alt={item.name}
                   className="w-20 h-20 object-cover rounded"
                 />
                 <div>
                   <h2 className="font-semibold">{item.name}</h2>
-                  <p>{item.price} đ</p>
+                  <p>{item.price.toLocaleString("vi-VN")} đ</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => updateQuantity(item._id, item.quantity - 1)}
+                  onClick={() =>
+                    updateQuantity(item._id, Math.max(1, item.quantity - 1))
+                  }
                   className="px-2 py-1 border rounded"
                 >
                   -
@@ -106,7 +81,7 @@ function Cart() {
                 </button>
                 <button
                   onClick={() => removeFromCart(item._id)}
-                  className="ml-4 text-red-500"
+                  className="ml-4 text-red-500 hover:text-red-700"
                 >
                   Xóa
                 </button>
@@ -114,11 +89,14 @@ function Cart() {
             </div>
           ))}
         </div>
-        <div className="mt-8 text-right">
-          <h2 className="text-xl font-bold">Tổng: {total} đ</h2>
+
+        <div className="mt-8 flex justify-end items-center gap-6">
+          <h2 className="text-xl font-bold">
+            Tổng: {total.toLocaleString("vi-VN")} đ
+          </h2>
           <button
             onClick={handleCheckout}
-            className="mt-4 bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition"
+            className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition"
           >
             Thanh toán
           </button>

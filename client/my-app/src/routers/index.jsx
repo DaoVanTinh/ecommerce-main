@@ -1,11 +1,7 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import NonAuthLayout from "../layouts/NonAuth";
-import Login from "../pages/Login";
-import MainLayout from "../layouts/MainLayout";
-import ProductManagement from "../pages/ProductManagement";
-import NotFoundPage from "../pages/404Page";
-import { getValueFromLocalStorage } from "../utils";
-import AddEditProduct from "../pages/AddEditProduct";
+import Profile from "../pages/Profile";
+import Cart from "../pages/Cart";
+import Orders from "../pages/Orders";
+import Home from "../pages/Home";
 
 const AppRouters = () => {
   const rawToken = getValueFromLocalStorage("token");
@@ -20,8 +16,12 @@ const AppRouters = () => {
       {token && (
         <Route path="/" element={<MainLayout />}>
           <Route path="product-management" element={<ProductManagement />} />
-          <Route index element={<Navigate to="product-management" replace />} />
           <Route path="add-product" element={<AddEditProduct />} />
+
+          <Route path="profile" element={<Profile />} />
+          <Route path="cart" element={<Cart />} />
+          <Route path="orders" element={<Orders />} />
+          <Route index element={<Home />} />
         </Route>
       )}
 

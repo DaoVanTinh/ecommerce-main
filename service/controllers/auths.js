@@ -69,3 +69,38 @@ export const login = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const getMe = async (req, res) => {
+  try {
+    res.json({
+      id: req.user._id,
+      username: req.user.username,
+      email: req.user.email,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const updateMe = async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    const updateData = { username, email };
+
+    if (password && password.trim() !== "") {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(req.user._id, updateData, {
+      new: true,
+    });
+
+    res.json({
+      id: updatedUser._id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

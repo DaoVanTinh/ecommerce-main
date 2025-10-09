@@ -9,6 +9,7 @@ import Orders from "./pages/Order";
 import Products from "./pages/Product";
 import AdminLogin from "./pages/LoginAdmin";
 import DashboardAdmin from "./pages/Admin";
+import Profile from "./pages/Profile";
 
 const AdminPrivateRoute = ({ children }) => {
   const token = localStorage.getItem("adminToken");
@@ -29,6 +30,7 @@ function App() {
       <Route path="/cart" element={<Cart />} />
       <Route path="/orders" element={<Orders />} />
       <Route path="/products" element={<Products />} />
+      <Route path="/profile" element={<Profile />} />
 
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route

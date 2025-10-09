@@ -1,5 +1,5 @@
+import React, { useEffect, useState, useContext } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useContext, useEffect, useState } from "react";
 import {
   ImageWithFallback,
   Footer,
@@ -9,7 +9,6 @@ import {
   Newsletter,
 } from "../../components";
 import { ImgError } from "../../assets";
-import React from "react";
 import { CartContext } from "../../context/CartProvider";
 
 export default function ProductDetail() {
@@ -19,7 +18,12 @@ export default function ProductDetail() {
   const [related, setRelated] = useState([]);
   const [showNotification, setShowNotification] = useState(false);
 
+  const { addToCart } = useContext(CartContext);
+
   useEffect(() => {
+    // Reset product khi id thay đổi để tránh giữ dữ liệu cũ
+    setProduct(null);
+
     const fetchProduct = async () => {
       try {
         const res = await fetch(`http://localhost:5000/api/products/${id}`);
@@ -39,13 +43,13 @@ export default function ProductDetail() {
         console.error("Error loading related:", err);
       }
     };
+
     fetchProduct();
     fetchRelated();
   }, [id]);
 
-  const { addToCart } = useContext(CartContext);
-
   const handleAddToCart = () => {
+    if (!product) return;
     addToCart({ ...product, quantity });
     setShowNotification(true);
     setTimeout(() => setShowNotification(false), 2000);
@@ -60,23 +64,28 @@ export default function ProductDetail() {
           Thêm vào giỏ hàng thành công!
         </div>
       )}
+
       <NotificationBar />
       <NavigationBar className="!bg-white" />
       <Breadcrumbs productName={product.name} />
 
       <div className="flex flex-col md:flex-row gap-12 max-w-6xl mx-auto p-6">
+        {/* Hình ảnh sản phẩm */}
         <div className="flex-1">
           <ImageWithFallback
-            src={product.image}
+            src={product.images?.[0] || ImgError}
             fallback={ImgError}
             alt={product.name}
             className="w-full h-[500px] object-contain rounded-xl border"
           />
         </div>
+
+        {/* Thông tin sản phẩm */}
         <div className="flex-1 rounded-xl border p-6">
           <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
           <p className="text-gray-500 mb-6">{product.description}</p>
           <p className="text-2xl font-semibold mb-6">${product.price}</p>
+
           <div className="flex items-center gap-4 mb-6">
             <button
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -92,6 +101,7 @@ export default function ProductDetail() {
               +
             </button>
           </div>
+
           <button
             onClick={handleAddToCart}
             className="bg-black text-white px-8 py-3 rounded-xl hover:bg-gray-800 transition"
@@ -100,6 +110,8 @@ export default function ProductDetail() {
           </button>
         </div>
       </div>
+
+      {/* Sản phẩm liên quan */}
       <div className="max-w-6xl mx-auto p-6">
         <h2 className="text-2xl font-bold mb-4">Sản phẩm liên quan</h2>
         {related.length === 0 ? (
@@ -107,25 +119,25 @@ export default function ProductDetail() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
             {related.map((item) => (
-              <div
+              <Link
                 key={item._id}
-                className="border rounded-xl p-4 hover:shadow-lg transition cursor-pointer"
+                to={`/products/${item._id}`}
+                className="border rounded-xl p-4 hover:shadow-lg transition"
               >
-                <Link to={`/products/${item._id}`}>
-                  <ImageWithFallback
-                    src={item.image}
-                    fallback={ImgError}
-                    alt={item.name}
-                    className="w-full h-40 object-contain mb-2"
-                  />
-                  <h3 className="text-lg font-semibold">{item.name}</h3>
-                  <p className="text-gray-500">${item.price}</p>
-                </Link>
-              </div>
+                <ImageWithFallback
+                  src={item.images?.[0] || ImgError}
+                  fallback={ImgError}
+                  alt={item.name}
+                  className="w-full h-40 object-contain mb-2"
+                />
+                <h3 className="text-lg font-semibold">{item.name}</h3>
+                <p className="text-gray-500">${item.price}</p>
+              </Link>
             ))}
           </div>
         )}
       </div>
+
       <Newsletter />
       <Footer />
     </div>

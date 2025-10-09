@@ -3,9 +3,14 @@ import { Navigate } from "react-router-dom";
 
 const AdminPrivateRoute = ({ children }) => {
   const token = localStorage.getItem("adminToken");
-  const user = JSON.parse(localStorage.getItem("adminInfo") || "{}");
+  let user = null;
+  try {
+    user = JSON.parse(localStorage.getItem("adminInfo"));
+  } catch {
+    user = null;
+  }
 
-  if (!token || user.role !== "admin") {
+  if (!token || !user || user.role !== "admin") {
     return <Navigate to="/admin/login" replace />;
   }
 

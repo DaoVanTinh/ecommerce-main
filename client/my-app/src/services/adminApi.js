@@ -16,9 +16,14 @@ export const adminLogin = (email, password) =>
   adminInstance.post("/login", { email, password });
 
 export const getProducts = () => adminInstance.get("/products");
-export const createProduct = (data) => adminInstance.post("/products", data);
+export const createProduct = (data) =>
+  adminInstance.post("/products", data, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 export const updateProduct = (id, data) =>
   adminInstance.put(`/products/${id}`, data);
 export const deleteProduct = (id) => adminInstance.delete(`/products/${id}`);
 
-export default adminInstance;
+export const getCategories = () => adminInstance.get("/categories");
+export const createCategory = (data) => adminInstance.post("/categories", data);
+export const deleteCategory = (id) => adminInstance.delete(`/categories/${id}`);
