@@ -21,7 +21,6 @@ export default function ProductDetail() {
   const { addToCart } = useContext(CartContext);
 
   useEffect(() => {
-    // Reset product khi id thay đổi để tránh giữ dữ liệu cũ
     setProduct(null);
 
     const fetchProduct = async () => {
@@ -70,7 +69,6 @@ export default function ProductDetail() {
       <Breadcrumbs productName={product.name} />
 
       <div className="flex flex-col md:flex-row gap-12 max-w-6xl mx-auto p-6">
-        {/* Hình ảnh sản phẩm */}
         <div className="flex-1">
           <ImageWithFallback
             src={product.images?.[0] || ImgError}
@@ -80,7 +78,6 @@ export default function ProductDetail() {
           />
         </div>
 
-        {/* Thông tin sản phẩm */}
         <div className="flex-1 rounded-xl border p-6">
           <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
           <p className="text-gray-500 mb-6">{product.description}</p>
@@ -111,7 +108,6 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      {/* Sản phẩm liên quan */}
       <div className="max-w-6xl mx-auto p-6">
         <h2 className="text-2xl font-bold mb-4">Sản phẩm liên quan</h2>
         {related.length === 0 ? (

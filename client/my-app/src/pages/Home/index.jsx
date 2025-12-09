@@ -247,7 +247,7 @@ function Home() {
               Hàng nghìn sản phẩm đang chờ đón bạn.
             </p>
           </div>
-          <Countdown targetDate="2025-10-15T00:00:00" />
+          <Countdown targetDate="2025-12-15T00:00:00" />
         </div>
       </div>
       <Value />
