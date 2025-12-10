@@ -3,7 +3,7 @@ export { default as NavigationBar } from "./NavigationBar.jsx";
 export { default as Countdown } from "./Countdown.jsx";
 export { default as Value } from "./Value.jsx";
 export { default as Footer } from "./Footer.jsx";
-export { default as ImageWithFallback } from "./ImageWithFallback.jsx";
+export { default as ImageWithFallback } from "./ImageWithFallBack.jsx";
 export { default as Breadcrumbs } from "./Breadcrumbs.jsx";
 export { default as Newsletter } from "./Newsletter.jsx";
 export { default as ShopHeader } from "./Shopheader.jsx";
