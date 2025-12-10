@@ -6,4 +6,4 @@ export { default as Footer } from "./Footer.jsx";
 export { default as ImageWithFallback } from "./ImageWithFallBack.jsx";
 export { default as Breadcrumbs } from "./Breadcrumbs.jsx";
 export { default as Newsletter } from "./Newsletter.jsx";
-export { default as ShopHeader } from "./Shopheader.jsx";
+export { default as ShopHeader } from "./ShopHeader.jsx";
