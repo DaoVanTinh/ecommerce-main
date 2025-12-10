@@ -1,4 +1,4 @@
-export { default as NotificationBar } from "./Notificationbar.jsx";
+export { default as NotificationBar } from "./NotificationBar.jsx";
 export { default as NavigationBar } from "./NavigationBar.jsx";
 export { default as Countdown } from "./Countdown.jsx";
 export { default as Value } from "./Value.jsx";
